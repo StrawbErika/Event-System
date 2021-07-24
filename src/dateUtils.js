@@ -40,7 +40,7 @@ export const endTimeChecker = (time, startTime, onError) => {
 };
 
 export const reformatTime = (time) => {
-  let timeString = time.toString().substring(16, 24);
+  let timeString = time.toString().substring(16, 21);
   const timeSplit = timeString.split(":");
   const hour = timeSplit[0];
   const minute = timeSplit[1];
@@ -61,4 +61,8 @@ export const dateChecker = (date, onError) => {
   } else {
     return true;
   }
+};
+
+export const reformatDate = (date) => {
+  return date.toString().substring(0, 15);
 };

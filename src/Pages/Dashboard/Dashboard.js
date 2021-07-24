@@ -10,34 +10,15 @@ export default function Dashboard({ userDetails }) {
   const onClose = () => {
     setOpenModal(false);
   };
-  const events = [
-    {
-      startTime: "8am",
-      endTime: "4pm",
-      date: "July 23, 2021",
-      author: "Me",
-      guests: ["1"],
-      id: "",
-    },
-    {
-      startTime: "8am",
-      endTime: "12am",
-      date: "July 23, 2021",
-      author: "Not Me",
-      guests: ["1", "2"],
-      id: "",
-    },
-  ];
-  const eventsMade = [
-    {
-      startTime: "8am",
-      endTime: "12am",
-      date: "July 23, 2021",
-      author: "Not Me",
-      guests: ["1", "2"],
-      id: "",
-    },
-  ];
+
+  const [events, setEvents] = useState([]);
+  const [eventsMade, setEventsMade] = useState([]);
+  const handleCreateEvent = (eventDetails) => {
+    setEventsMade(eventsMade.concat(eventDetails));
+  };
+  const handleEventDetails = (eventDetails) => {
+    console.log(eventDetails);
+  };
   return (
     <Box my={10}>
       <Box mx={3} display="flex" justifyContent="flex-end">
@@ -73,29 +54,48 @@ export default function Dashboard({ userDetails }) {
         >
           <Box height="65vh" mr={2} py={2}>
             Here are the events you have:
-            {events.map((event) => {
-              return <Event eventDetails={event} />;
-            })}
+            {events &&
+              events.map((event) => {
+                return <Event eventDetails={event} />;
+              })}
           </Box>
           <Box ml={5}>
-            <Box height="65vh" mr={2} py={2}>
+            <Box
+              height="65vh"
+              mr={2}
+              py={2}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
               Here are the events you made:
-              {eventsMade.map((event) => {
-                return <Event eventDetails={event} type="owned" />;
-              })}
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  setOpenModal(!openModal);
-                }}
-              >
-                <Add />
-              </Button>
+              {eventsMade &&
+                eventsMade.map((event) => {
+                  console.log(event);
+                  return (
+                    <Event
+                      onEditEvent={handleEventDetails}
+                      eventDetails={event}
+                      type="owned"
+                    />
+                  );
+                })}
+              <Box mt={1}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    setOpenModal(!openModal);
+                  }}
+                >
+                  <Add />
+                </Button>
+              </Box>
               <CreateModal
                 open={openModal}
                 handleClose={onClose}
                 user={userDetails.name}
+                onCreateEvent={handleCreateEvent}
               />
             </Box>
           </Box>

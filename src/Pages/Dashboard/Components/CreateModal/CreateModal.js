@@ -19,7 +19,9 @@ import {
   endTimeChecker,
   reformatTime,
   dateChecker,
+  reformatDate,
 } from "../../../../dateUtils";
+import { uuid } from "uuidv4";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -38,22 +40,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function CreateModal({ open, handleClose, userDetails }) {
+export default function CreateModal({
+  open,
+  handleClose,
+  userDetails,
+  onCreateEvent,
+}) {
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [guests, setGuests] = useState([]);
-  const [event, setEvent] = useState(null);
 
   // TODO: part of event obj ?
   const [date, setDate] = useState(new Date());
-  const [startTime, setStartTime] = useState({ obj: new Date() });
-  const [endTime, setEndTime] = useState({ obj: new Date() });
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
   const [error, setError] = useState({});
 
   const handleDateChange = (date) => {
     onError("date", null);
     if (dateChecker(date, onError)) {
-      const dateString = date.toString().substring(0, 15);
+      const dateString = reformatDate(date);
       setDate(dateString);
     }
   };
@@ -65,18 +71,18 @@ export default function CreateModal({ open, handleClose, userDetails }) {
   const handleStartChange = (time) => {
     onError("startTime", null);
     const outputTime = reformatTime(time);
-    const reformatEnd = reformatTime(endTime.obj);
+    const reformatEnd = reformatTime(endTime);
     if (startTimeChecker(outputTime, reformatEnd, onError)) {
-      setStartTime({ display: outputTime.display, obj: time });
+      setStartTime(time);
     }
   };
 
   const handleEndTime = (time) => {
     onError("endTime", null);
     const outputTime = reformatTime(time);
-    const reformatStart = reformatTime(startTime.obj);
+    const reformatStart = reformatTime(startTime);
     if (endTimeChecker(outputTime, reformatStart, onError)) {
-      setEndTime({ display: outputTime.display, obj: time });
+      setEndTime(time);
     }
   };
 
@@ -96,19 +102,24 @@ export default function CreateModal({ open, handleClose, userDetails }) {
   };
 
   const createEvent = () => {
+    setError({});
+    // TODO: checker if doesnt touch any of the pickers use dateutils
     if (guests.length < 1) {
       onError("guests", "Please tag atleast 1 guest");
     } else {
+      // TODO: check if start time is > than currentTime
       const eventDetails = {
-        ...event,
         guests: guests,
         date: date,
         startTime: startTime,
         endTime: endTime,
         author: userDetails,
+        id: uuid(),
         // create uid
       };
-      setEvent(eventDetails);
+      console.log(eventDetails);
+      handleClose();
+      onCreateEvent(eventDetails);
     }
   };
   return (
@@ -159,7 +170,7 @@ export default function CreateModal({ open, handleClose, userDetails }) {
                       margin="normal"
                       id="time-picker"
                       label="Start time"
-                      value={startTime.obj}
+                      value={startTime}
                       onChange={handleStartChange}
                       KeyboardButtonProps={{
                         "aria-label": "change time",
@@ -176,7 +187,7 @@ export default function CreateModal({ open, handleClose, userDetails }) {
                       margin="normal"
                       id="time-picker"
                       label="End time"
-                      value={endTime.obj}
+                      value={endTime}
                       onChange={handleEndTime}
                       KeyboardButtonProps={{
                         "aria-label": "change time",
@@ -250,6 +261,18 @@ export default function CreateModal({ open, handleClose, userDetails }) {
                 </Box>
               </Box>
             )}
+            <Box
+              display="flex"
+              width="100%"
+              alignItems="center"
+              justifyContent="center"
+            >
+              {error && error.event && (
+                <Box color="red" fontSize={11}>
+                  {error.event}
+                </Box>
+              )}
+            </Box>
 
             <Button onClick={createEvent}>Create Event</Button>
           </Box>
