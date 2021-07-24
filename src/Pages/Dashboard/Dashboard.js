@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { TextField, Box, Radio, Button } from "@material-ui/core/";
 import { BrowserRouter as Router, Link } from "react-router-dom";
 import Event from "./Components/Event/Event";
-import EventModal from "./Components/EventModal/EventModal";
+import CreateModal from "./Components/CreateModal/CreateModal";
 import { Add } from "@material-ui/icons/";
 
 export default function Dashboard({ userDetails }) {
@@ -12,16 +12,30 @@ export default function Dashboard({ userDetails }) {
   };
   const events = [
     {
-      start: "8am",
-      end: "4pm",
+      startTime: "8am",
+      endTime: "4pm",
       date: "July 23, 2021",
       author: "Me",
+      guests: ["1"],
+      id: "",
     },
     {
-      start: "8am",
-      end: "12am",
+      startTime: "8am",
+      endTime: "12am",
       date: "July 23, 2021",
       author: "Not Me",
+      guests: ["1", "2"],
+      id: "",
+    },
+  ];
+  const eventsMade = [
+    {
+      startTime: "8am",
+      endTime: "12am",
+      date: "July 23, 2021",
+      author: "Not Me",
+      guests: ["1", "2"],
+      id: "",
     },
   ];
   return (
@@ -50,6 +64,7 @@ export default function Dashboard({ userDetails }) {
             <Box>what would you like to do today?</Box>
           </Box>
         </Box>
+        <Box></Box>
         <Box
           display="flex"
           flexDirection="row"
@@ -61,16 +76,28 @@ export default function Dashboard({ userDetails }) {
             {events.map((event) => {
               return <Event eventDetails={event} />;
             })}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                setOpenModal(!openModal);
-              }}
-            >
-              <Add />
-            </Button>
-            <EventModal open={openModal} handleClose={onClose} />
+          </Box>
+          <Box ml={5}>
+            <Box height="65vh" mr={2} py={2}>
+              Here are the events you made:
+              {eventsMade.map((event) => {
+                return <Event eventDetails={event} type="owned" />;
+              })}
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  setOpenModal(!openModal);
+                }}
+              >
+                <Add />
+              </Button>
+              <CreateModal
+                open={openModal}
+                handleClose={onClose}
+                user={userDetails.name}
+              />
+            </Box>
           </Box>
         </Box>
       </Box>

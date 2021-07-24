@@ -14,6 +14,12 @@ import {
   KeyboardDatePicker,
 } from "@material-ui/pickers";
 import { Add } from "@material-ui/icons/";
+import {
+  startTimeChecker,
+  endTimeChecker,
+  reformatTime,
+  dateChecker,
+} from "../../../../dateUtils";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -32,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EventModal({ open, handleClose }) {
+export default function CreateModal({ open, handleClose, userDetails }) {
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [guests, setGuests] = useState([]);
@@ -45,89 +51,33 @@ export default function EventModal({ open, handleClose }) {
   const [error, setError] = useState({});
 
   const handleDateChange = (date) => {
-    setError({ ...error, date: null });
-    const today = new Date();
-    const todayTime = today.getTime();
-    const dateTime = date.getTime(date) + 23 * 60 * 60 * 1000; //Adds 23hrs into the date (since date's time is always 00)
-    if (todayTime > dateTime) {
-      setError({ ...error, date: "Cannot create an event in the past" });
-    } else {
+    onError("date", null);
+    if (dateChecker(date, onError)) {
       const dateString = date.toString().substring(0, 15);
       setDate(dateString);
     }
   };
 
+  const onError = (title, message) => {
+    setError({ ...error, [title]: message });
+  };
+
   const handleStartChange = (time) => {
-    setError({ ...error, startTime: null });
+    onError("startTime", null);
     const outputTime = reformatTime(time);
-    if (outputTime.hour < 8) {
-      setError({ ...error, startTime: "Cannot create before 8" });
-    } else if (endTime && outputTime.hour > reformatTime(endTime.obj).hour) {
-      setError({
-        ...error,
-        startTime: "Cannot have start time after end time",
-      });
-    } else if (
-      endTime &&
-      outputTime.hour === reformatTime(endTime.obj).hour &&
-      (outputTime.minute > reformatTime(endTime.obj).minute ||
-        outputTime.minute === reformatTime(endTime.obj).minute)
-    ) {
-      setError({
-        ...error,
-        startTime: "Cannot have start time after end time",
-      });
-    } else {
+    const reformatEnd = reformatTime(endTime.obj);
+    if (startTimeChecker(outputTime, reformatEnd, onError)) {
       setStartTime({ display: outputTime.display, obj: time });
     }
   };
 
   const handleEndTime = (time) => {
-    setError({ ...error, endTime: null });
+    onError("endTime", null);
     const outputTime = reformatTime(time);
-    if (
-      outputTime.hour > 20 ||
-      (outputTime.hour === 20 && outputTime.minute > 0)
-    ) {
-      setError({ ...error, endTime: "Cannot create past 8" });
-    } else if (
-      outputTime.hour < 8 ||
-      (outputTime.hour === 8 && outputTime.minute === 0)
-    ) {
-      setError({ ...error, endTime: "Cannot create before 8" });
-    } else if (
-      startTime &&
-      outputTime.hour < reformatTime(startTime.obj).hour
-    ) {
-      setError({
-        ...error,
-        endTime: "Cannot have end time after start time",
-      });
-    } else if (
-      startTime &&
-      outputTime.hour === reformatTime(startTime.obj).hour &&
-      (outputTime.minute < reformatTime(startTime.obj).minute ||
-        outputTime.minute === reformatTime(startTime.obj).minute)
-    ) {
-      setError({
-        ...error,
-        endTime: "Cannot have end time after start time",
-      });
-    } else {
+    const reformatStart = reformatTime(startTime.obj);
+    if (endTimeChecker(outputTime, reformatStart, onError)) {
       setEndTime({ display: outputTime.display, obj: time });
     }
-  };
-
-  const reformatTime = (time) => {
-    let timeString = time.toString().substring(16, 24);
-    const timeSplit = timeString.split(":");
-    const hour = timeSplit[0];
-    const minute = timeSplit[1];
-    return {
-      display: timeString,
-      hour: parseInt(hour),
-      minute: parseInt(minute),
-    };
   };
 
   const handleGuest = (e) => {
@@ -136,15 +86,9 @@ export default function EventModal({ open, handleClose }) {
   };
 
   const handleAddGuest = () => {
-    setError({
-      ...error,
-      guests: null,
-    });
+    onError("guests", null);
     if (!guest || guest === " ") {
-      setError({
-        ...error,
-        guests: "Guest field cannot be empty",
-      });
+      onError("guests", "Guest field cannot be empty");
     } else {
       const tempGuest = guests.concat(guest);
       setGuests(tempGuest);
@@ -153,10 +97,7 @@ export default function EventModal({ open, handleClose }) {
 
   const createEvent = () => {
     if (guests.length < 1) {
-      setError({
-        ...error,
-        guests: "Please tag atleast 1 guest",
-      });
+      onError("guests", "Please tag atleast 1 guest");
     } else {
       const eventDetails = {
         ...event,
@@ -164,7 +105,10 @@ export default function EventModal({ open, handleClose }) {
         date: date,
         startTime: startTime,
         endTime: endTime,
+        author: userDetails,
+        // create uid
       };
+      setEvent(eventDetails);
     }
   };
   return (
