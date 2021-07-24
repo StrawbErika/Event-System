@@ -12,6 +12,9 @@ function App() {
     <div className="App">
       <Router>
         <Switch>
+          <Route exact path="/">
+            <SignUp />
+          </Route>
           <Route exact path="/signup">
             <SignUp />
           </Route>

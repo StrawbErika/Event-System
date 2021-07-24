@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { TextField, Box, Radio, Button } from "@material-ui/core/";
 import { BrowserRouter as Router, Link } from "react-router-dom";
 import Event from "./Components/Event/Event";
+import EventModal from "./Components/EventModal/EventModal";
 import { Add } from "@material-ui/icons/";
 
 export default function Dashboard({ userDetails }) {
@@ -69,6 +70,7 @@ export default function Dashboard({ userDetails }) {
             >
               <Add />
             </Button>
+            <EventModal open={openModal} handleClose={onClose} />
           </Box>
         </Box>
       </Box>
