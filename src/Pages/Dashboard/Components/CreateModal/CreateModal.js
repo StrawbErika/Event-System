@@ -21,6 +21,7 @@ import {
   dateChecker,
   reformatDate,
 } from "../../../../dateUtils";
+import SimpleSnackbar from "../../../../Components/SimpleSnackbar/SimpleSnackbar";
 import { uuid } from "uuidv4";
 
 const useStyles = makeStyles((theme) => ({
@@ -46,6 +47,11 @@ export default function CreateModal({
   userDetails,
   onCreateEvent,
 }) {
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const onClose = () => {
+    setOpenSnackbar(false);
+  };
+
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [guests, setGuests] = useState([]);
@@ -117,8 +123,8 @@ export default function CreateModal({
         id: uuid(),
         // create uid
       };
-      console.log(eventDetails);
       handleClose();
+      setOpenSnackbar(!openSnackbar);
       onCreateEvent(eventDetails);
     }
   };
@@ -278,6 +284,11 @@ export default function CreateModal({
           </Box>
         </div>
       </Modal>
+      <SimpleSnackbar
+        open={openSnackbar}
+        handleClose={onClose}
+        message="Event has been created"
+      />
     </div>
   );
 }

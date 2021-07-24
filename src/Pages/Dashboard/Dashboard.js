@@ -71,7 +71,6 @@ export default function Dashboard({ userDetails }) {
               Here are the events you made:
               {eventsMade &&
                 eventsMade.map((event) => {
-                  console.log(event);
                   return (
                     <Event
                       onEditEvent={handleEventDetails}

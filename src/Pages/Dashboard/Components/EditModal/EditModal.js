@@ -253,6 +253,7 @@ export default function EditModal({
                 Guests you have invited:
                 <Box>
                   {/* SCROLLABLE */}
+                  {/* TODO: able to edit name and delete */}
                   {guests.map((guest) => {
                     return <Box my={1}>{guest}</Box>;
                   })}
