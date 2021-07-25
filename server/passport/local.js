@@ -8,7 +8,7 @@ const strategy = new LocalStrategy(
     passwordField: "password",
   },
   async function (username, password, done) {
-    const userRes = await db("users").select().where({
+    const userRes = await db("users").select("id", "username").where({
       username: username,
       password: password,
       // TODO: hash password
@@ -30,6 +30,7 @@ const deserialize = async (id, done) => {
     id: id,
   });
   const user = userRes[0];
+  delete user.password;
   done(null, user);
 };
 
