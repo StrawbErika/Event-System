@@ -20,7 +20,7 @@ import {
   reformatTime,
   dateChecker,
   reformatDate,
-} from "../../../../dateUtils";
+} from "../../../../utils";
 import SimpleSnackbar from "../../../../Components/SimpleSnackbar/SimpleSnackbar";
 import { api } from "../../../../api";
 import Select from "react-select";
@@ -47,6 +47,7 @@ export default function CreateModal({
   handleClose,
   user,
   onCreateEvent,
+  initUsers,
 }) {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const onClose = () => {
@@ -56,7 +57,6 @@ export default function CreateModal({
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [guests, setGuests] = useState([]);
-  const [initGuests, setInitGuests] = useState([]);
 
   const [date, setDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
@@ -129,24 +129,6 @@ export default function CreateModal({
     setGuest(null);
   };
 
-  const initializeGuests = () => {
-    async function run() {
-      const allUsers = await api.get("/users/read");
-      const guests = allUsers.data.filter((guest) => {
-        return guest.id !== user;
-      });
-      setInitGuests(reformatGuests(guests));
-    }
-    run();
-  };
-
-  const reformatGuests = (guests) => {
-    const final = guests.map((guest) => {
-      return { value: guest.id, label: guest.username };
-    });
-    return final;
-  };
-  useEffect(initializeGuests, []);
   return (
     <div>
       <Modal
@@ -228,17 +210,11 @@ export default function CreateModal({
               </Box>
             </MuiPickersUtilsProvider>
             <Box mb={2}>
-              <Box
-                mt={1}
-                mb={1}
-                display="flex"
-                // justifyContent="center"
-                width="100%"
-              >
+              <Box mt={1} mb={1} display="flex" width="100%">
                 <Box mr={1} width="100%">
                   <Select
                     width="200px"
-                    options={initGuests}
+                    options={initUsers}
                     onChange={handleGuest}
                   />
                 </Box>

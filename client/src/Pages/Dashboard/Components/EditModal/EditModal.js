@@ -20,8 +20,8 @@ import {
   reformatTime,
   dateChecker,
   reformatDate,
-} from "../../../../dateUtils";
-import { uuid } from "uuidv4";
+} from "../../../../utils";
+import Select from "react-select";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -45,10 +45,12 @@ export default function EditModal({
   handleClose,
   eventDetails,
   onEditEvent,
+  initUsers,
+  guests,
+  onEditGuests,
 }) {
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
-  const [guests, setGuests] = useState([]);
   // const [guests, setGuests] = useState(eventDetails.guests);
 
   // TODO: part of event obj ?
@@ -90,7 +92,7 @@ export default function EditModal({
       onError("guests", "Guest field cannot be empty");
     } else {
       const tempGuest = guests.concat(guest);
-      setGuests(tempGuest);
+      onEditGuests(tempGuest);
     }
   };
 
@@ -98,7 +100,7 @@ export default function EditModal({
     setError({});
     const start = reformatTime(startTime);
     const end = reformatTime(endTime);
-    if (guests.length < 1) {
+    if (guests && guests.length < 1) {
       onError("guests", "Please tag atleast 1 guest");
     } else if (
       startTimeChecker(start, end, onError) &&
@@ -197,21 +199,13 @@ export default function EditModal({
               </Box>
             </MuiPickersUtilsProvider>
             <Box mb={2}>
-              <Box
-                mt={1}
-                mb={1}
-                display="flex"
-                justifyContent="center"
-                width="100%"
-              >
-                <Box mr={1}>
+              <Box mt={1} mb={1} display="flex" width="100%">
+                <Box mr={1} width="100%">
                   {/* TODO:React select */}
-                  <TextField
-                    label="Invite a guest"
+                  <Select
+                    width="200px"
+                    options={initUsers}
                     onChange={handleGuest}
-                    value={guest || ""}
-                    name="guest"
-                    variant="outlined"
                   />
                 </Box>
                 {guests.length < 10 ? (
@@ -251,7 +245,7 @@ export default function EditModal({
                   {/* SCROLLABLE */}
                   {/* TODO: able to and delete */}
                   {guests.map((guest) => {
-                    return <Box my={1}>{guest}</Box>;
+                    return <Box my={1}>{guest.username}</Box>;
                   })}
                 </Box>
               </Box>

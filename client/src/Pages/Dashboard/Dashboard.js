@@ -5,6 +5,7 @@ import Event from "./Components/Event/Event";
 import CreateModal from "./Components/CreateModal/CreateModal";
 import { Add } from "@material-ui/icons/";
 import { api } from "../../api";
+import { reformatGuests } from "../../utils";
 
 export default function Dashboard() {
   let history = useHistory();
@@ -14,6 +15,7 @@ export default function Dashboard() {
   const onClose = () => {
     setOpenModal(false);
   };
+  const [initUsers, setInitUsers] = useState([]);
 
   const [events, setEvents] = useState([]);
   const [eventsMade, setEventsMade] = useState([]);
@@ -42,12 +44,18 @@ export default function Dashboard() {
       const body = { id: user.data.id };
       const eventsCreated = await api.post("/events/readOwned", body);
       const eventsInvited = await api.post("/events/readInvited", body);
+      const allUsers = await api.get("/users/read");
+      const guests = allUsers.data.filter((guest) => {
+        return guest.id !== user.data.id;
+      });
+      setInitUsers(reformatGuests(guests));
       setEvents(eventsInvited.data);
       setEventsMade(eventsCreated.data);
       setUserDetails(user.data);
     }
     run();
   };
+
   // TODO: reformat dates from library
   // https://moment.github.io/luxon/#/
 
@@ -107,6 +115,7 @@ export default function Dashboard() {
                       onEditEvent={handleEventDetails}
                       eventDetails={event}
                       onDeleteEvent={handleDeleteEvent}
+                      initUsers={initUsers}
                       type="owned"
                     />
                   );
@@ -127,6 +136,7 @@ export default function Dashboard() {
                 handleClose={onClose}
                 user={userDetails && userDetails.id}
                 onCreateEvent={handleCreateEvent}
+                initUsers={initUsers}
               />
             </Box>
           </Box>

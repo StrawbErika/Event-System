@@ -42,18 +42,6 @@ router.post("/edit", async function (req, res) {
   //
 });
 
-router.post("/deleteGuest", async function (req, res) {
-  const guestsId = req.body.id;
-  // TODO:
-  //
-});
-
-router.post("/addGuests", async function (req, res) {
-  const guestsId = req.body.id;
-  // TODO:
-  //
-});
-
 router.post("/readOwned", async function (req, res) {
   const events = await db("events").select().where({ author: req.body.id });
   res.send(events);

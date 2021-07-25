@@ -39,6 +39,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var sessionRouter = require("./routes/session");
 var eventsRouter = require("./routes/events");
+var guestRouter = require("./routes/guest");
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -50,6 +51,7 @@ app.use("/", indexRouter);
 app.use("/users", isLoggedIn, usersRouter);
 app.use("/session", sessionRouter);
 app.use("/events", eventsRouter);
+app.use("/guest", guestRouter);
 
 app.use(express.static(__dirname));
 

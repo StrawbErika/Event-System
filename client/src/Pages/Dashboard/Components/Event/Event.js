@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Button } from "@material-ui/core/";
 import { Edit, Delete } from "@material-ui/icons/";
-import { reformatTime, reformatDate } from "../../../../dateUtils";
+import { reformatTime, reformatDate } from "../../../../utils";
 import EditModal from "../EditModal/EditModal";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import { api } from "../../../../api";
@@ -10,9 +10,11 @@ export default function Event({
   onEditEvent,
   onDeleteEvent,
   type,
+  initUsers,
 }) {
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [guests, setGuests] = useState([]);
   const onClose = () => {
     setOpenModal(false);
   };
@@ -28,6 +30,20 @@ export default function Event({
     const body = { id: eventDetails.id };
     await api.post("/events/delete", body);
   };
+
+  const handleEditGuest = (guests) => {
+    setGuests(guests);
+  };
+  const initGuests = () => {
+    async function run() {
+      const body = { id: eventDetails.id };
+      const guestsRes = await api.post("/guest/read", body);
+      setGuests(guestsRes.data);
+    }
+    run();
+  };
+
+  useEffect(initGuests, []);
   return (
     <Box my={2}>
       <Paper>
@@ -66,6 +82,8 @@ export default function Event({
             handleClose={onClose}
             eventDetails={eventDetails}
             onEditEvent={onEditEvent}
+            initUsers={initUsers}
+            guests={guests}
           />
           <DeleteModal open={openDeleteModal} handleClose={handleDelete} />
         </Box>

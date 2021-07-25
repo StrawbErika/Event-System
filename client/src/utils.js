@@ -66,3 +66,10 @@ export const dateChecker = (date, onError) => {
 export const reformatDate = (date) => {
   return date.toString().substring(0, 15);
 };
+
+export const reformatGuests = (guests) => {
+  const final = guests.map((guest) => {
+    return { value: guest.id, label: guest.username };
+  });
+  return final;
+};
