@@ -12,6 +12,7 @@ router.post("/create", async function (req, res) {
     startTime: req.body.startTime,
     endTime: req.body.endTime,
     author: req.body.author,
+    id: eventId,
   });
   const event = await db("events").select().where({
     id: eventsBody.id,
@@ -30,20 +31,45 @@ router.post("/create", async function (req, res) {
 });
 
 router.post("/delete", async function (req, res) {
-  await db("events").where("id", req.body.id).del();
-  //   TODO: what will res?
-  const events = await db("events").select();
+  const eventId = req.body.id;
+  await db("users_events").where("event_id", eventId).del();
+  await db("events").where("id", eventId).del();
+});
+
+router.post("/edit", async function (req, res) {
+  const eventId = req.body.id;
+  // TODO:
+  //
+});
+
+router.post("/deleteGuest", async function (req, res) {
+  const guestsId = req.body.id;
+  // TODO:
+  //
+});
+
+router.post("/addGuests", async function (req, res) {
+  const guestsId = req.body.id;
+  // TODO:
+  //
+});
+
+router.post("/readOwned", async function (req, res) {
+  const events = await db("events").select().where({ author: req.body.id });
   res.send(events);
 });
 
-router.post("/read", async function (req, res) {
-  const events = await db("events").select();
+// TODO:
+router.post("/readInvited", async function (req, res) {
+  const userId = req.body.id;
+  const query = `
+  select e.id, e.date, e.startTime, e.endTime, e.author from events e 
+  inner join users_events ue on e.id = ue.event_id 
+  INNER JOIN users u on u.id = ue.guest_id 
+  WHERE u.id = "${userId}";
+  `;
+  const events = await db.raw(query);
   res.send(events);
-});
-
-router.post("/readOne", async function (req, res) {
-  const event = await db("events").select().where({ id: req.body.id });
-  res.send(event);
 });
 
 router.post("/");

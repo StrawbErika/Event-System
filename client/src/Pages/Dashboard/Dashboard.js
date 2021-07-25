@@ -21,18 +21,14 @@ export default function Dashboard() {
     setEventsMade(eventsMade.concat(eventDetails));
   };
 
+  const handleDeleteEvent = (id) => {
+    setEventsMade(eventsMade.filter((event) => event.id !== id));
+  };
   const handleEventDetails = (eventDetails) => {
     const withoutEvent = eventsMade.filter((event) => {
       return event.id !== eventDetails.id;
     });
     setEventsMade(withoutEvent.concat(eventDetails));
-  };
-  const initUser = () => {
-    async function run() {
-      const user = await api.get("/session/whoami");
-      setUserDetails(user.data);
-    }
-    run();
   };
 
   const logout = async () => {
@@ -40,7 +36,22 @@ export default function Dashboard() {
     history.push("/");
   };
 
-  useEffect(initUser, []);
+  const initDetails = () => {
+    async function run() {
+      const user = await api.get("/session/whoami");
+      const body = { id: user.data.id };
+      const eventsCreated = await api.post("/events/readOwned", body);
+      const eventsInvited = await api.post("/events/readInvited", body);
+      setEvents(eventsInvited.data);
+      setEventsMade(eventsCreated.data);
+      setUserDetails(user.data);
+    }
+    run();
+  };
+  // TODO: reformat dates from library
+  // https://moment.github.io/luxon/#/
+
+  useEffect(initDetails, []);
   if (!userDetails) {
     return <></>;
   }
@@ -95,6 +106,7 @@ export default function Dashboard() {
                     <Event
                       onEditEvent={handleEventDetails}
                       eventDetails={event}
+                      onDeleteEvent={handleDeleteEvent}
                       type="owned"
                     />
                   );

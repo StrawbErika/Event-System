@@ -4,19 +4,30 @@ import { Edit, Delete } from "@material-ui/icons/";
 import { reformatTime, reformatDate } from "../../../../dateUtils";
 import EditModal from "../EditModal/EditModal";
 import DeleteModal from "../DeleteModal/DeleteModal";
-export default function Event({ eventDetails, onEditEvent, type }) {
+import { api } from "../../../../api";
+export default function Event({
+  eventDetails,
+  onEditEvent,
+  onDeleteEvent,
+  type,
+}) {
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const onClose = () => {
     setOpenModal(false);
   };
-  const onCloseDelete = () => {
-    setOpenDeleteModal(false);
-  };
+
   // TODO: instead of using display, use hour and minute so can display in AM PM
   const start = reformatTime(eventDetails.startTime).display;
   const end = reformatTime(eventDetails.endTime).display;
   const date = reformatDate(eventDetails.date);
+
+  const handleDelete = async () => {
+    setOpenDeleteModal(false);
+    onDeleteEvent(eventDetails.id);
+    const body = { id: eventDetails.id };
+    await api.post("/events/delete", body);
+  };
   return (
     <Box my={2}>
       <Paper>
@@ -50,13 +61,13 @@ export default function Event({ eventDetails, onEditEvent, type }) {
               </Button>
             </Box>
           )}
-          {/* <EditModal
+          <EditModal
             open={openModal}
             handleClose={onClose}
             eventDetails={eventDetails}
             onEditEvent={onEditEvent}
-          /> */}
-          <DeleteModal open={openDeleteModal} handleClose={onCloseDelete} />
+          />
+          <DeleteModal open={openDeleteModal} handleClose={handleDelete} />
         </Box>
       </Paper>
     </Box>
