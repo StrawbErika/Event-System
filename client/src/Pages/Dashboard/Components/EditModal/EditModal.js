@@ -48,7 +48,8 @@ export default function EditModal({
 }) {
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
-  const [guests, setGuests] = useState(eventDetails.guests);
+  const [guests, setGuests] = useState([]);
+  // const [guests, setGuests] = useState(eventDetails.guests);
 
   // TODO: part of event obj ?
   const [date, setDate] = useState(eventDetails.date);

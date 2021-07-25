@@ -38,6 +38,7 @@ initLocalStrategy();
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var sessionRouter = require("./routes/session");
+var eventsRouter = require("./routes/events");
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -48,6 +49,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", isLoggedIn, usersRouter);
 app.use("/session", sessionRouter);
+app.use("/events", eventsRouter);
 
 app.use(express.static(__dirname));
 

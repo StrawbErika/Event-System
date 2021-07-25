@@ -30,7 +30,6 @@ export default function Dashboard() {
   const initUser = () => {
     async function run() {
       const user = await api.get("/session/whoami");
-      console.log(user);
       setUserDetails(user.data);
     }
     run();
@@ -42,6 +41,9 @@ export default function Dashboard() {
   };
 
   useEffect(initUser, []);
+  if (!userDetails) {
+    return <></>;
+  }
 
   return (
     <Box my={10}>
@@ -111,7 +113,7 @@ export default function Dashboard() {
               <CreateModal
                 open={openModal}
                 handleClose={onClose}
-                user={userDetails}
+                user={userDetails && userDetails.id}
                 onCreateEvent={handleCreateEvent}
               />
             </Box>

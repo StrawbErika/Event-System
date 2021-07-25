@@ -1,13 +1,30 @@
-exports.up = function (knex) {
+exports.up = async function (knex) {
   //what instructions to setup db
-  return knex.schema.createTable("users", function (table) {
+  await knex.schema.createTable("users", function (table) {
     table.string("id").primary();
     table.string("username");
     table.string("password");
   });
+
+  await knex.schema.createTable("events", function (table) {
+    table.string("id").primary();
+    table.timestamp("date");
+    table.timestamp("startTime");
+    table.timestamp("endTime");
+    table.string("author");
+  });
+
+  // TODO: how to relationship table
+  return knex.schema.createTable("users_events", function (table) {
+    table.string("author_id");
+    table.string("guest_id");
+    table.string("event_id");
+  });
 };
 
-exports.down = function (knex) {
+exports.down = async function (knex) {
   //what do when reverting up
-  return knex.schema.dropTableIfExists("users");
+  await knex.schema.dropTableIfExists("users_events");
+  await knex.schema.dropTableIfExists("users");
+  return knex.schema.dropTableIfExists("events");
 };

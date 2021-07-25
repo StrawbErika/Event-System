@@ -22,7 +22,8 @@ import {
   reformatDate,
 } from "../../../../dateUtils";
 import SimpleSnackbar from "../../../../Components/SimpleSnackbar/SimpleSnackbar";
-import { uuid } from "uuidv4";
+import { api } from "../../../../api";
+import Select from "react-select";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -44,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
 export default function CreateModal({
   open,
   handleClose,
-  userDetails,
+  user,
   onCreateEvent,
 }) {
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -55,6 +56,7 @@ export default function CreateModal({
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [guests, setGuests] = useState([]);
+  const [initGuests, setInitGuests] = useState([]);
 
   const [date, setDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
@@ -83,27 +85,20 @@ export default function CreateModal({
     setEndTime(time);
   };
 
-  const handleGuest = (e) => {
-    //   TODO: the only choices are the users
-    setGuest(e.target.value);
-  };
-
   const handleAddGuest = () => {
     onError("guests", null);
-    if (!guest || guest === " ") {
-      onError("guests", "Guest field cannot be empty");
-    } else {
-      const tempGuest = guests.concat(guest);
-      setGuests(tempGuest);
-    }
+    const tempGuest = guests.concat(guest);
+    setGuests(tempGuest);
   };
 
-  // TODO: check whenever submit instead of input
-  const createEvent = () => {
+  const handleGuest = (selected) => {
+    setGuest({ id: selected.value, username: selected.label });
+  };
+
+  const createEvent = async () => {
     setError({});
     const start = reformatTime(startTime);
     const end = reformatTime(endTime);
-    // TODO: checker if doesnt touch any of the pickers use dateutils
     if (guests.length < 1) {
       onError("guests", "Please tag atleast 1 guest");
     } else if (
@@ -112,14 +107,13 @@ export default function CreateModal({
     ) {
       // TODO: check if start time is > than currentTime
       const eventDetails = {
-        guests: guests,
         date: date,
         startTime: startTime,
         endTime: endTime,
-        author: userDetails,
-        id: uuid(),
-        // create uid
+        author: user,
+        guests: guests,
       };
+      await api.post("/events/create", eventDetails);
       handleClose();
       setOpenSnackbar(!openSnackbar);
       emptyFields();
@@ -135,6 +129,24 @@ export default function CreateModal({
     setGuest(null);
   };
 
+  const initializeGuests = () => {
+    async function run() {
+      const allUsers = await api.get("/users/read");
+      const guests = allUsers.data.filter((guest) => {
+        return guest.id !== user;
+      });
+      setInitGuests(reformatGuests(guests));
+    }
+    run();
+  };
+
+  const reformatGuests = (guests) => {
+    const final = guests.map((guest) => {
+      return { value: guest.id, label: guest.username };
+    });
+    return final;
+  };
+  useEffect(initializeGuests, []);
   return (
     <div>
       <Modal
@@ -220,17 +232,14 @@ export default function CreateModal({
                 mt={1}
                 mb={1}
                 display="flex"
-                justifyContent="center"
+                // justifyContent="center"
                 width="100%"
               >
-                <Box mr={1}>
-                  {/* TODO:React select */}
-                  <TextField
-                    label="Invite a guest"
+                <Box mr={1} width="100%">
+                  <Select
+                    width="200px"
+                    options={initGuests}
                     onChange={handleGuest}
-                    value={guest || ""}
-                    name="guest"
-                    variant="outlined"
                   />
                 </Box>
                 {guests.length < 10 ? (
@@ -269,7 +278,7 @@ export default function CreateModal({
                 <Box>
                   {/* SCROLLABLE */}
                   {guests.map((guest) => {
-                    return <Box my={1}>{guest}</Box>;
+                    return <Box my={1}>{guest.username}</Box>;
                   })}
                 </Box>
               </Box>

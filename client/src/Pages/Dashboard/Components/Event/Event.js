@@ -50,12 +50,12 @@ export default function Event({ eventDetails, onEditEvent, type }) {
               </Button>
             </Box>
           )}
-          <EditModal
+          {/* <EditModal
             open={openModal}
             handleClose={onClose}
             eventDetails={eventDetails}
             onEditEvent={onEditEvent}
-          />
+          /> */}
           <DeleteModal open={openDeleteModal} handleClose={onCloseDelete} />
         </Box>
       </Paper>
