@@ -70,20 +70,12 @@ export default function EditModal({
 
   const handleStartChange = (time) => {
     onError("startTime", null);
-    const outputTime = reformatTime(time);
-    const reformatEnd = reformatTime(endTime);
-    if (startTimeChecker(outputTime, reformatEnd, onError)) {
-      setStartTime(time);
-    }
+    setStartTime(time);
   };
 
   const handleEndTime = (time) => {
     onError("endTime", null);
-    const outputTime = reformatTime(time);
-    const reformatStart = reformatTime(startTime);
-    if (endTimeChecker(outputTime, reformatStart, onError)) {
-      setEndTime(time);
-    }
+    setEndTime(time);
   };
 
   const handleGuest = (e) => {
@@ -103,10 +95,14 @@ export default function EditModal({
 
   const editEvent = () => {
     setError({});
-    // TODO: checker if doesnt touch any of the pickers use dateutils
+    const start = reformatTime(startTime);
+    const end = reformatTime(endTime);
     if (guests.length < 1) {
       onError("guests", "Please tag atleast 1 guest");
-    } else {
+    } else if (
+      startTimeChecker(start, end, onError) &&
+      endTimeChecker(end, start, onError)
+    ) {
       // TODO: check if start time is > than currentTime
       const editEvent = {
         ...eventDetails,
@@ -115,7 +111,6 @@ export default function EditModal({
         startTime: startTime,
         endTime: endTime,
       };
-      console.log(editEvent);
       handleClose();
       onEditEvent(editEvent);
     }
@@ -253,7 +248,7 @@ export default function EditModal({
                 Guests you have invited:
                 <Box>
                   {/* SCROLLABLE */}
-                  {/* TODO: able to edit name and delete */}
+                  {/* TODO: able to and delete */}
                   {guests.map((guest) => {
                     return <Box my={1}>{guest}</Box>;
                   })}

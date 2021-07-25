@@ -56,7 +56,6 @@ export default function CreateModal({
   const [guest, setGuest] = useState(null);
   const [guests, setGuests] = useState([]);
 
-  // TODO: part of event obj ?
   const [date, setDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
@@ -64,8 +63,8 @@ export default function CreateModal({
 
   const handleDateChange = (date) => {
     onError("date", null);
+    const dateString = reformatDate(date);
     if (dateChecker(date, onError)) {
-      const dateString = reformatDate(date);
       setDate(dateString);
     }
   };
@@ -76,20 +75,12 @@ export default function CreateModal({
 
   const handleStartChange = (time) => {
     onError("startTime", null);
-    const outputTime = reformatTime(time);
-    const reformatEnd = reformatTime(endTime);
-    if (startTimeChecker(outputTime, reformatEnd, onError)) {
-      setStartTime(time);
-    }
+    setStartTime(time);
   };
 
   const handleEndTime = (time) => {
     onError("endTime", null);
-    const outputTime = reformatTime(time);
-    const reformatStart = reformatTime(startTime);
-    if (endTimeChecker(outputTime, reformatStart, onError)) {
-      setEndTime(time);
-    }
+    setEndTime(time);
   };
 
   const handleGuest = (e) => {
@@ -107,12 +98,18 @@ export default function CreateModal({
     }
   };
 
+  // TODO: check whenever submit instead of input
   const createEvent = () => {
     setError({});
+    const start = reformatTime(startTime);
+    const end = reformatTime(endTime);
     // TODO: checker if doesnt touch any of the pickers use dateutils
     if (guests.length < 1) {
       onError("guests", "Please tag atleast 1 guest");
-    } else {
+    } else if (
+      startTimeChecker(start, end, onError) &&
+      endTimeChecker(end, start, onError)
+    ) {
       // TODO: check if start time is > than currentTime
       const eventDetails = {
         guests: guests,
@@ -125,9 +122,19 @@ export default function CreateModal({
       };
       handleClose();
       setOpenSnackbar(!openSnackbar);
+      emptyFields();
       onCreateEvent(eventDetails);
     }
   };
+
+  const emptyFields = () => {
+    setGuests([]);
+    setDate(new Date());
+    setStartTime(new Date());
+    setEndTime(new Date());
+    setGuest(null);
+  };
+
   return (
     <div>
       <Modal

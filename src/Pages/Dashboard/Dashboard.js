@@ -16,9 +16,14 @@ export default function Dashboard({ userDetails }) {
   const handleCreateEvent = (eventDetails) => {
     setEventsMade(eventsMade.concat(eventDetails));
   };
+
   const handleEventDetails = (eventDetails) => {
-    console.log(eventDetails);
+    const withoutEvent = eventsMade.filter((event) => {
+      return event.id !== eventDetails.id;
+    });
+    setEventsMade(withoutEvent.concat(eventDetails));
   };
+
   return (
     <Box my={10}>
       <Box mx={3} display="flex" justifyContent="flex-end">
