@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { TextField, Box, Radio, Button } from "@material-ui/core/";
-import { BrowserRouter as Router, Link } from "react-router-dom";
+import { BrowserRouter as Router, useHistory, Link } from "react-router-dom";
 import Event from "./Components/Event/Event";
 import CreateModal from "./Components/CreateModal/CreateModal";
 import { Add } from "@material-ui/icons/";
+import { api } from "../../api";
 
-export default function Dashboard({ userDetails }) {
+export default function Dashboard() {
+  let history = useHistory();
+
   const [openModal, setOpenModal] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
   const onClose = () => {
     setOpenModal(false);
   };
@@ -23,17 +27,26 @@ export default function Dashboard({ userDetails }) {
     });
     setEventsMade(withoutEvent.concat(eventDetails));
   };
+  const initUser = () => {
+    async function run() {
+      const user = await api.get("/session/whoami");
+      console.log(user);
+      setUserDetails(user.data);
+    }
+    run();
+  };
+
+  const logout = async () => {
+    await api.get("/session/logout");
+    history.push("/");
+  };
+
+  useEffect(initUser, []);
 
   return (
     <Box my={10}>
       <Box mx={3} display="flex" justifyContent="flex-end">
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => {
-            console.log("signing out aight");
-          }}
-        >
+        <Button variant="outlined" color="secondary" onClick={logout}>
           {" "}
           Sign Out
         </Button>
@@ -46,7 +59,7 @@ export default function Dashboard({ userDetails }) {
       >
         <Box mt={3} mb={5} fontSize={20} display="flex" flexDirection="column">
           <Box>
-            <Box>Welcome {userDetails.name} ,</Box>
+            <Box>Welcome {userDetails && userDetails.username} ,</Box>
             <Box>what would you like to do today?</Box>
           </Box>
         </Box>
@@ -98,7 +111,7 @@ export default function Dashboard({ userDetails }) {
               <CreateModal
                 open={openModal}
                 handleClose={onClose}
-                user={userDetails.name}
+                user={userDetails}
                 onCreateEvent={handleCreateEvent}
               />
             </Box>

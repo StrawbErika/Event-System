@@ -2,28 +2,30 @@ var express = require("express");
 var router = express.Router();
 const passport = require("passport");
 const { db } = require("../db");
+const { uuid } = require("uuidv4");
 
 router.post("/login", passport.authenticate("local"), function (req, res) {
   res.json(req.user);
 });
 
-router.post("/logout", function (req, res) {
+router.get("/logout", function (req, res) {
   req.logout();
   res.send("Logged out");
 });
 
-router.post("/whoami", function (req, res) {
+router.get("/whoami", function (req, res) {
   if (req.user) {
     res.json(req.user);
   } else {
-    res.send("Logged out");
+    res.send(false);
   }
 });
 
 router.post("/signup", async function (req, res) {
-  await db("users").insert(req.body);
+  const userBody = { ...req.body, id: uuid() };
+  await db("users").insert(userBody);
   const user = await db("users").select("id", "username").where({
-    id: req.body.id,
+    id: userBody.id,
   });
   res.send(user);
 });

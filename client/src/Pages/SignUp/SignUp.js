@@ -1,18 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { TextField, Box, Radio, Button } from "@material-ui/core/";
 import { useHistory, Link } from "react-router-dom";
+import { api } from "../../api";
 
 export default function SignUp() {
   let history = useHistory();
 
   const [user, setUser] = useState(null);
-
+  const [error, setError] = useState(null);
   const handleFieldChange = (e) => {
+    setError(null);
     setUser({
       ...user,
       [e.target.name]: e.target.value,
-      error: "",
     });
+  };
+
+  const handleSignUp = async () => {
+    if (user.username && user.password) {
+      let body = { username: user.username, password: user.password };
+      await api.post("/session/signup", body);
+      // TODO: has an error
+      history.push("/login");
+    } else {
+      setError("Input user/password in the fields");
+    }
   };
 
   return (
@@ -34,17 +46,8 @@ export default function SignUp() {
       >
         <Box marginBottom={1}>
           <TextField
-            label="Email"
-            name="email"
-            type="email"
-            onChange={handleFieldChange}
-            variant="outlined"
-          />
-        </Box>
-        <Box marginBottom={1}>
-          <TextField
             label="User Name"
-            name="name"
+            name="username"
             onChange={handleFieldChange}
             variant="outlined"
           />
@@ -59,15 +62,16 @@ export default function SignUp() {
           />
         </Box>
       </Box>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => {
-          console.log("hehe signup");
-        }}
-      >
+      <Button variant="contained" color="primary" onClick={handleSignUp}>
         Sign Up
       </Button>
+      <Box mt={2}>
+        {error && (
+          <Box color="red" fontSize={15}>
+            {error}
+          </Box>
+        )}
+      </Box>
 
       <Box marginTop={2}>
         <Link to="/login"> Already have an account?</Link>

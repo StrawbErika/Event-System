@@ -22,10 +22,12 @@ const strategy = new LocalStrategy(
 );
 
 const serialize = (user, done) => {
+  // serialize is to get the data that would uniquiely identify the session (usually id)
   done(null, user.id);
 };
 
 const deserialize = async (id, done) => {
+  // deserialize is getting the whole user obj
   const userRes = await db("users").select().where({
     id: id,
   });

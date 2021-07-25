@@ -13,7 +13,8 @@ function App() {
       <Router>
         <Switch>
           <Route exact path="/">
-            <SignUp />
+            <Login />
+            {/* TODO: redirect */}
           </Route>
           <Route exact path="/signup">
             <SignUp />
@@ -21,6 +22,7 @@ function App() {
           <Route exact path="/login">
             <Login />
           </Route>
+          {/* TODO: check if logged in /whoami, else redirect*/}
           <Route exact path="/dashboard">
             <Dashboard userDetails={user} />
           </Route>

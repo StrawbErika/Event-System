@@ -4,8 +4,17 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var app = express();
-const { isLoggedIn } = require("./middleware/auth");
 
+var cors = require("cors");
+var corsOptions = {
+  origin: "http://localhost:3000",
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+};
+app.use(cors(corsOptions));
+
+const { isLoggedIn } = require("./middleware/auth");
 const bodyParser = require("body-parser");
 const expressSession = require("express-session")({
   secret: "secret",
