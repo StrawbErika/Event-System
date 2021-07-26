@@ -26,11 +26,19 @@ export default function Dashboard() {
   const handleDeleteEvent = (id) => {
     setEventsMade(eventsMade.filter((event) => event.id !== id));
   };
-  const handleEventDetails = (eventDetails) => {
+
+  const handleEventDetails = async (eventDetails) => {
     const withoutEvent = eventsMade.filter((event) => {
       return event.id !== eventDetails.id;
     });
     setEventsMade(withoutEvent.concat(eventDetails));
+    await api.post("/events/edit", {
+      date: eventDetails.date,
+      id: eventDetails.id,
+      startTime: eventDetails.startTime,
+      endTime: eventDetails.endTime,
+      author: eventDetails.author,
+    });
   };
 
   const logout = async () => {

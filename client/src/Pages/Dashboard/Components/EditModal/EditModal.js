@@ -54,6 +54,7 @@ export default function EditModal({
   // const [guests, setGuests] = useState(eventDetails.guests);
 
   // TODO: part of event obj ?
+  const [changed, setChanged] = useState({});
   const [date, setDate] = useState(eventDetails.date);
   const [startTime, setStartTime] = useState(eventDetails.startTime);
   const [endTime, setEndTime] = useState(eventDetails.endTime);
@@ -62,8 +63,8 @@ export default function EditModal({
   const handleDateChange = (date) => {
     onError("date", null);
     if (dateChecker(date, onError)) {
-      const dateString = reformatDate(date);
-      setDate(dateString);
+      setChanged({ ...changed, date: true });
+      setDate(date);
     }
   };
 
@@ -73,11 +74,13 @@ export default function EditModal({
 
   const handleStartChange = (time) => {
     onError("startTime", null);
+    setChanged({ ...changed, start: true });
     setStartTime(time);
   };
 
   const handleEndTime = (time) => {
     onError("endTime", null);
+    setChanged({ ...changed, end: true });
     setEndTime(time);
   };
 
@@ -110,9 +113,9 @@ export default function EditModal({
       const editEvent = {
         ...eventDetails,
         guests: guests,
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
+        date: changed.date ? date.toISOString() : date,
+        startTime: changed.start ? startTime.toISOString() : startTime,
+        endTime: changed.end ? endTime.toISOString() : endTime,
       };
       handleClose();
       onEditEvent(editEvent);

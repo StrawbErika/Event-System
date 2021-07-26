@@ -37,9 +37,12 @@ router.post("/delete", async function (req, res) {
 });
 
 router.post("/edit", async function (req, res) {
-  const eventId = req.body.id;
-  // TODO:
-  //
+  await db("events").where({ id: req.body.id }).update({
+    date: req.body.date,
+    startTime: req.body.startTime,
+    endTime: req.body.endTime,
+    author: req.body.author,
+  });
 });
 
 router.post("/readOwned", async function (req, res) {
@@ -47,7 +50,6 @@ router.post("/readOwned", async function (req, res) {
   res.send(events);
 });
 
-// TODO:
 router.post("/readInvited", async function (req, res) {
   const userId = req.body.id;
   const query = `
@@ -63,4 +65,3 @@ router.post("/readInvited", async function (req, res) {
 router.post("/");
 
 module.exports = router;
-// can login

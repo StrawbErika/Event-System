@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Box, Paper, Button } from "@material-ui/core/";
 import { Edit, Delete } from "@material-ui/icons/";
-import { reformatTime, reformatDate } from "../../../../utils";
 import EditModal from "../EditModal/EditModal";
 import DeleteModal from "../DeleteModal/DeleteModal";
 import { api } from "../../../../api";
+import { DateTime } from "luxon";
+
 export default function Event({
   eventDetails,
   onEditEvent,
@@ -19,10 +20,16 @@ export default function Event({
     setOpenModal(false);
   };
 
-  // TODO: instead of using display, use hour and minute so can display in AM PM
-  const start = reformatTime(eventDetails.startTime).display;
-  const end = reformatTime(eventDetails.endTime).display;
-  const date = reformatDate(eventDetails.date);
+  // move to formatter
+  const initStart = DateTime.fromISO(eventDetails.startTime).toLocaleString(
+    DateTime.DATETIME_MED
+  );
+  const initEnd = DateTime.fromISO(eventDetails.endTime).toLocaleString(
+    DateTime.DATETIME_MED
+  );
+  const start = initStart.split(",")[2];
+  const end = initEnd.split(",")[2];
+  const date = DateTime.fromISO(eventDetails.date).toLocaleString();
 
   const handleDelete = async () => {
     setOpenDeleteModal(false);
@@ -31,9 +38,11 @@ export default function Event({
     await api.post("/events/delete", body);
   };
 
+  // TODO:
   const handleEditGuest = (guests) => {
     setGuests(guests);
   };
+
   const initGuests = () => {
     async function run() {
       const body = { id: eventDetails.id };
@@ -42,7 +51,6 @@ export default function Event({
     }
     run();
   };
-
   useEffect(initGuests, []);
   return (
     <Box my={2}>
