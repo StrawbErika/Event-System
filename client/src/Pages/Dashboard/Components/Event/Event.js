@@ -94,14 +94,16 @@ export default function Event({
               </Button>
             </Box>
           )}
-          <EditModal
-            open={openModal}
-            handleClose={onClose}
-            eventDetails={eventDetails}
-            onEditEvent={onEditEvent}
-            initUsers={initUsers}
-            guests={guests}
-          />
+          {openModal && (
+            <EditModal
+              open={openModal}
+              handleClose={onClose}
+              eventDetails={eventDetails}
+              onEditEvent={onEditEvent}
+              initUsers={initUsers}
+              guests={guests}
+            />
+          )}
           <DeleteModal open={openDeleteModal} handleClose={handleDelete} />
         </Box>
       </Paper>

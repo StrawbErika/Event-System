@@ -43,8 +43,6 @@ export default function EditModal({
   initUsers,
   guests,
 }) {
-  open && console.log(eventDetails);
-
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [editGuests, setEditGuests] = useState(guests);
@@ -112,6 +110,7 @@ export default function EditModal({
     } else {
       const body = {
         id: delGuest.id,
+        eventId: eventDetails.id,
       };
 
       setEditGuests(tempGuest);

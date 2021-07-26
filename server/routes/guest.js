@@ -6,7 +6,10 @@ const { uuid } = require("uuidv4");
 
 router.post("/delete", async function (req, res) {
   const guestId = req.body.id;
-  await db("users_events").where("guest_id", guestId).del();
+  const eventId = req.body.eventId;
+  await db("users_events")
+    .where({ guest_id: guestId, event_id: eventId })
+    .del();
 });
 
 router.post("/add", async function (req, res) {

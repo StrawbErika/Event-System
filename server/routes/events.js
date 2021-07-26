@@ -27,7 +27,7 @@ router.post("/create", async function (req, res) {
       };
     })
   );
-  res.send(event);
+  res.send(event[0]);
 });
 
 router.post("/delete", async function (req, res) {

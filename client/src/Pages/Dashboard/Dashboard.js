@@ -7,11 +7,10 @@ import { Add } from "@material-ui/icons/";
 import { api } from "../../api";
 import { reformatGuests } from "../../utils";
 
-export default function Dashboard() {
+export default function Dashboard({ userDetails, onLogout }) {
   let history = useHistory();
 
   const [openModal, setOpenModal] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
   const onClose = () => {
     setOpenModal(false);
   };
@@ -42,22 +41,20 @@ export default function Dashboard() {
 
   const logout = async () => {
     await api.get("/session/logout");
-    history.push("/");
+    onLogout();
   };
 
   const initDetails = () => {
     async function run() {
-      const user = await api.get("/session/whoami");
-      const body = { id: user.data.id };
+      const body = { id: userDetails.id };
       const eventsCreated = await api.post("/events/readOwned", body);
       const eventsInvited = await api.post("/events/readInvited", body);
       const allUsers = await api.get("/users/read");
       const guests = allUsers.data.filter((guest) => {
-        return guest.id !== user.data.id;
+        return guest.id !== userDetails.id;
       });
       setEvents(eventsInvited.data);
       setEventsMade(eventsCreated.data);
-      setUserDetails(user.data);
       setInitUsers(reformatGuests(guests));
     }
     run();
@@ -141,13 +138,15 @@ export default function Dashboard() {
                   <Add />
                 </Button>
               </Box>
-              <CreateModal
-                open={openModal}
-                handleClose={onClose}
-                user={userDetails && userDetails.id}
-                onCreateEvent={handleCreateEvent}
-                initUsers={initUsers}
-              />
+              {openModal && (
+                <CreateModal
+                  open={openModal}
+                  handleClose={onClose}
+                  user={userDetails && userDetails.id}
+                  onCreateEvent={handleCreateEvent}
+                  initUsers={initUsers}
+                />
+              )}
             </Box>
           </Box>
         </Box>

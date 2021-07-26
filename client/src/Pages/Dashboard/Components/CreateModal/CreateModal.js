@@ -51,7 +51,7 @@ export default function CreateModal({
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [guests, setGuests] = useState([]);
-  const [users, setUsers] = useState(removeUsers(initUsers, guests));
+  const [users, setUsers] = useState(removeUsers(initUsers, []));
 
   const [date, setDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
@@ -116,16 +116,16 @@ export default function CreateModal({
         endTimeChecker(end, start, onError)
       ) {
         const eventDetails = {
-          date: date.toISOString(),
+          date: new Date(date).toISOString(),
           startTime: startTime.toISOString(),
           endTime: endTime.toISOString(),
           author: user,
           guests: guests,
         };
-        await api.post("/events/create", eventDetails);
+        const response = await api.post("/events/create", eventDetails);
         handleClose();
         setOpenSnackbar(!openSnackbar);
-        onCreateEvent(eventDetails);
+        onCreateEvent({ ...eventDetails, id: response.data.id });
         emptyFields();
       }
     }
@@ -264,7 +264,11 @@ export default function CreateModal({
                 <Box>
                   {/* SCROLLABLE */}
                   {guests.map((guest) => {
-                    return <Box my={1}>{guest.username}</Box>;
+                    return (
+                      <Box my={1} key={guest.id}>
+                        {guest.username}
+                      </Box>
+                    );
                   })}
                 </Box>
               </Box>

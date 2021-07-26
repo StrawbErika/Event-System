@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import { TextField, Box, Button } from "@material-ui/core/";
 import { useHistory, Link } from "react-router-dom";
 import { api } from "../../api";
-export default function Login() {
-  let history = useHistory();
-
+export default function Login({ handleLogin }) {
   const [user, setUser] = useState({
     username: "",
     password: "",
@@ -17,16 +15,6 @@ export default function Login() {
       ...user,
       [e.target.name]: e.target.value,
     });
-  };
-
-  const handleLogin = async () => {
-    if (user.username && user.password) {
-      let body = { username: user.username, password: user.password };
-      await api.post("/session/login", body);
-      history.push("/dashboard");
-    } else {
-      setError("Input user/password in the fields");
-    }
   };
 
   return (
@@ -60,7 +48,13 @@ export default function Login() {
           />
         </Box>
       </Box>
-      <Button variant="contained" color="primary" onClick={handleLogin}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => {
+          handleLogin(user, setError);
+        }}
+      >
         Login
       </Button>
       <Box mt={2}>

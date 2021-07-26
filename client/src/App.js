@@ -12,30 +12,48 @@ import Dashboard from "./Pages/Dashboard/Dashboard";
 import { api } from "./api";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const checkLogin = async () => {
+  const [userDetails, setUserDetails] = useState(null);
+  const [sessionIsFetched, setSessionIsFetched] = useState(false);
+  const initUser = () => {
     async function run() {
       const user = await api.get("/session/whoami");
-      setIsLoggedIn(user ? true : false);
+      setUserDetails(user.data);
+      setSessionIsFetched(true);
     }
     run();
   };
-  useEffect(checkLogin, []);
+
+  const handleLogin = async (user, setError) => {
+    if (user.username && user.password) {
+      let body = { username: user.username, password: user.password };
+      const userRes = await api.post("/session/login", body);
+      setUserDetails(userRes.data);
+    } else {
+      setError("Input user/password in the fields");
+    }
+  };
+
+  const handleLogout = () => {
+    setUserDetails(null);
+  };
+
+  useEffect(initUser, []);
+  if (!sessionIsFetched) {
+    return <> </>;
+  }
   return (
     <div className="App">
       <Router>
         <Switch>
           <Route exact path="/">
-            <Redirect to="/login" />
+            {userDetails ? (
+              <Dashboard userDetails={userDetails} onLogout={handleLogout} />
+            ) : (
+              <Login handleLogin={handleLogin} />
+            )}
           </Route>
           <Route exact path="/signup">
             <SignUp />
-          </Route>
-          <Route exact path="/login">
-            <Login />
-          </Route>
-          <Route exact path="/dashboard">
-            {isLoggedIn === true ? <Dashboard /> : <Redirect to="/login" />}
           </Route>
         </Switch>
       </Router>
