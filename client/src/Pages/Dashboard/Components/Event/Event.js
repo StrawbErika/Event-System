@@ -15,6 +15,7 @@ export default function Event({
 }) {
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [authorName, setAuthorName] = useState(null);
   const [init, setInit] = useState(false);
   const [guests, setGuests] = useState([]);
   const onClose = () => {
@@ -39,16 +40,23 @@ export default function Event({
     await api.post("/events/delete", body);
   };
 
-  const initGuests = () => {
+  const initialize = () => {
     async function run() {
       const body = { id: eventDetails.id };
       const guestsRes = await api.post("/guest/read", body);
       setGuests(guestsRes.data);
+      if (type !== "owned") {
+        const authorId = {
+          id: eventDetails.author,
+        };
+        const author = await api.post("/users/readOne", authorId);
+        setAuthorName(author.data[0].username);
+      }
       setInit(true);
     }
     run();
   };
-  useEffect(initGuests, []);
+  useEffect(initialize, []);
   if (!init) {
     return <></>;
   }
@@ -60,7 +68,7 @@ export default function Event({
             {start} to {end}
           </Box>
           <Box>{date}</Box>
-          {type !== "owned" && <Box>Author: {eventDetails.author}</Box>}
+          {type !== "owned" && <Box>Author: {authorName}</Box>}
 
           {type === "owned" && (
             <Box
