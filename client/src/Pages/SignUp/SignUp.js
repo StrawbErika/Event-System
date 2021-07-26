@@ -20,7 +20,7 @@ export default function SignUp() {
     if (user.username && user.password) {
       let body = { username: user.username, password: user.password };
       await api.post("/session/signup", body);
-      history.push("/login");
+      history.push("/");
     } else {
       setError("Input user/password in the fields");
     }
@@ -73,7 +73,7 @@ export default function SignUp() {
       </Box>
 
       <Box marginTop={2}>
-        <Link to="/login"> Already have an account?</Link>
+        <Link to="/"> Already have an account?</Link>
       </Box>
     </Box>
   );
