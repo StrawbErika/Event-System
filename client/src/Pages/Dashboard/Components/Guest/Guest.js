@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box, Button } from "@material-ui/core/";
 import { Delete } from "@material-ui/icons/";
 

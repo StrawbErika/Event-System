@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Box, Radio, Button } from "@material-ui/core/";
-import { BrowserRouter as Router, useHistory, Link } from "react-router-dom";
+import { Box, Button } from "@material-ui/core/";
+import { useHistory } from "react-router-dom";
 import Event from "./Components/Event/Event";
 import CreateModal from "./Components/CreateModal/CreateModal";
 import { Add } from "@material-ui/icons/";
@@ -22,7 +22,6 @@ export default function Dashboard() {
   const handleCreateEvent = (eventDetails) => {
     setEventsMade(eventsMade.concat(eventDetails));
   };
-
   const handleDeleteEvent = (id) => {
     setEventsMade(eventsMade.filter((event) => event.id !== id));
   };
@@ -56,16 +55,15 @@ export default function Dashboard() {
       const guests = allUsers.data.filter((guest) => {
         return guest.id !== user.data.id;
       });
-      setInitUsers(reformatGuests(guests));
       setEvents(eventsInvited.data);
       setEventsMade(eventsCreated.data);
       setUserDetails(user.data);
+      setInitUsers(reformatGuests(guests));
     }
     run();
   };
-
   useEffect(initDetails, []);
-  if (!userDetails) {
+  if (!userDetails || initUsers.length < 1) {
     return <></>;
   }
 
@@ -100,7 +98,13 @@ export default function Dashboard() {
             Here are the events you have:
             {events &&
               events.map((event) => {
-                return <Event eventDetails={event} />;
+                return (
+                  <Event
+                    key={event.id}
+                    eventDetails={event}
+                    initUsers={initUsers}
+                  />
+                );
               })}
           </Box>
           <Box ml={5}>
@@ -117,6 +121,7 @@ export default function Dashboard() {
                 eventsMade.map((event) => {
                   return (
                     <Event
+                      key={event.id}
                       onEditEvent={handleEventDetails}
                       eventDetails={event}
                       onDeleteEvent={handleDeleteEvent}

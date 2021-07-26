@@ -16,8 +16,9 @@ export default function Event({
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [authorName, setAuthorName] = useState(null);
-  const [init, setInit] = useState(false);
   const [guests, setGuests] = useState([]);
+  const [init, setInit] = useState(false);
+
   const onClose = () => {
     setOpenModal(false);
   };
@@ -57,7 +58,7 @@ export default function Event({
     run();
   };
   useEffect(initialize, []);
-  if (!init) {
+  if (guests.length < 1 || initUsers.length < 1) {
     return <></>;
   }
   return (

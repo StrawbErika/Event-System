@@ -62,6 +62,10 @@ router.post("/readInvited", async function (req, res) {
   res.send(events);
 });
 
+router.get("/readAll", async function (req, res) {
+  const events = await db("events").select();
+  res.send(events);
+});
 router.post("/");
 
 module.exports = router;

@@ -59,6 +59,7 @@ export default function CreateModal({
   const [error, setError] = useState({});
 
   const handleDateChange = (date) => {
+    onError("event", null);
     onError("date", null);
     const dateString = reformatDate(date);
     if (dateChecker(date, onError)) {
@@ -71,16 +72,19 @@ export default function CreateModal({
   };
 
   const handleStartChange = (time) => {
+    onError("event", null);
     onError("startTime", null);
     setStartTime(time);
   };
 
   const handleEndTime = (time) => {
+    onError("event", null);
     onError("endTime", null);
     setEndTime(time);
   };
 
   const handleAddGuest = () => {
+    onError("event", null);
     onError("guests", null);
     const tempGuest = guests.concat(guest);
     const tempUsers = users.filter((user) => {
@@ -96,27 +100,34 @@ export default function CreateModal({
 
   const createEvent = async () => {
     setError({});
-    const start = reformatTime(startTime);
-    const end = reformatTime(endTime);
-    if (guests.length < 1) {
-      onError("guests", "Please tag atleast 1 guest");
-    } else if (
-      startTimeChecker(start, end, onError) &&
-      endTimeChecker(end, start, onError)
-    ) {
-      // TODO: check if start time is > than currentTime
-      const eventDetails = {
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
-        author: user,
-        guests: guests,
-      };
-      await api.post("/events/create", eventDetails);
-      handleClose();
-      setOpenSnackbar(!openSnackbar);
-      emptyFields();
-      onCreateEvent(eventDetails);
+
+    const currentTs = new Date().getTime() / 1000;
+    const startTs = new Date(startTime).getTime() / 1000;
+    if (startTs < currentTs) {
+      onError("event", "Cannot create event with past time");
+    } else {
+      onError("event", null);
+      const start = reformatTime(startTime);
+      const end = reformatTime(endTime);
+      if (guests.length < 1) {
+        onError("guests", "Please tag atleast 1 guest");
+      } else if (
+        startTimeChecker(start, end, onError) &&
+        endTimeChecker(end, start, onError)
+      ) {
+        const eventDetails = {
+          date: date.toISOString(),
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
+          author: user,
+          guests: guests,
+        };
+        await api.post("/events/create", eventDetails);
+        handleClose();
+        setOpenSnackbar(!openSnackbar);
+        onCreateEvent(eventDetails);
+        emptyFields();
+      }
     }
   };
 

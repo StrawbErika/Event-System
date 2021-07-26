@@ -42,6 +42,5 @@ function App() {
     </div>
   );
 }
-// passport js for auth
 
 export default App;

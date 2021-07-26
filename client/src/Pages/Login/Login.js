@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { TextField, Box, Radio, Button } from "@material-ui/core/";
+import React, { useState } from "react";
+import { TextField, Box, Button } from "@material-ui/core/";
 import { useHistory, Link } from "react-router-dom";
 import { api } from "../../api";
 export default function Login() {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Box, Button, makeStyles, Modal, Backdrop } from "@material-ui/core/";
 import SimpleSnackbar from "../../../../Components/SimpleSnackbar/SimpleSnackbar";
 const useStyles = makeStyles((theme) => ({

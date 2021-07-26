@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Box, Button, makeStyles, Modal, Backdrop } from "@material-ui/core/";
 import DateFnsUtils from "@date-io/date-fns";
 import {
@@ -6,7 +6,7 @@ import {
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { Add, Delete } from "@material-ui/icons/";
+import { Add } from "@material-ui/icons/";
 import {
   startTimeChecker,
   endTimeChecker,
@@ -43,6 +43,8 @@ export default function EditModal({
   initUsers,
   guests,
 }) {
+  open && console.log(eventDetails);
+
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [editGuests, setEditGuests] = useState(guests);
@@ -118,7 +120,9 @@ export default function EditModal({
       await api.post("/guest/delete", body);
     }
   };
-
+  if (editGuests.length < 1) {
+    return <></>;
+  }
   const editEvent = () => {
     setError({});
     const start = reformatTime(startTime);
@@ -268,6 +272,7 @@ export default function EditModal({
                   {editGuests.map((guest) => {
                     return (
                       <Guest
+                        key={guest.id}
                         guest={guest}
                         handleDeleteGuest={handleDeleteGuest}
                       />
