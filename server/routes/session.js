@@ -17,7 +17,7 @@ router.get("/whoami", function (req, res) {
   if (req.user) {
     res.json(req.user);
   } else {
-    res.send(false);
+    res.send(null);
   }
 });
 
