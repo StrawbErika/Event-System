@@ -5,15 +5,17 @@ const { db } = require("../db");
 const { uuid } = require("uuidv4");
 
 router.post("/delete", async function (req, res) {
-  const guestsId = req.body.id;
-  // TODO:
-  //
+  const guestId = req.body.id;
+  await db("users_events").where("guest_id", guestId).del();
 });
 
 router.post("/add", async function (req, res) {
-  const guestsId = req.body.id;
-  // TODO:
-  //
+  const guest = req.body;
+  await db("users_events").insert({
+    guest_id: guest.id,
+    author_id: guest.author,
+    event_id: guest.event_id,
+  });
 });
 
 router.post("/read", async function (req, res) {

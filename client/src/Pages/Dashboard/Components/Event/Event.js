@@ -15,6 +15,7 @@ export default function Event({
 }) {
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [init, setInit] = useState(false);
   const [guests, setGuests] = useState([]);
   const onClose = () => {
     setOpenModal(false);
@@ -38,20 +39,19 @@ export default function Event({
     await api.post("/events/delete", body);
   };
 
-  // TODO:
-  const handleEditGuest = (guests) => {
-    setGuests(guests);
-  };
-
   const initGuests = () => {
     async function run() {
       const body = { id: eventDetails.id };
       const guestsRes = await api.post("/guest/read", body);
       setGuests(guestsRes.data);
+      setInit(true);
     }
     run();
   };
   useEffect(initGuests, []);
+  if (!init) {
+    return <></>;
+  }
   return (
     <Box my={2}>
       <Paper>

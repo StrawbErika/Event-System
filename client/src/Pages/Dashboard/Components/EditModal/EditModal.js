@@ -1,27 +1,21 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  makeStyles,
-  Modal,
-  Backdrop,
-} from "@material-ui/core/";
+import { Box, Button, makeStyles, Modal, Backdrop } from "@material-ui/core/";
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from "@material-ui/pickers";
-import { Add } from "@material-ui/icons/";
+import { Add, Delete } from "@material-ui/icons/";
 import {
   startTimeChecker,
   endTimeChecker,
   reformatTime,
   dateChecker,
-  reformatDate,
 } from "../../../../utils";
 import Select from "react-select";
+import Guest from "../Guest/Guest";
+import { api } from "../../../../api";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -47,11 +41,10 @@ export default function EditModal({
   onEditEvent,
   initUsers,
   guests,
-  onEditGuests,
 }) {
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
-  // const [guests, setGuests] = useState(eventDetails.guests);
+  const [editGuests, setEditGuests] = useState(guests);
 
   // TODO: part of event obj ?
   const [changed, setChanged] = useState({});
@@ -84,18 +77,36 @@ export default function EditModal({
     setEndTime(time);
   };
 
-  const handleGuest = (e) => {
-    //   TODO: the only choices are the users
-    setGuest(e.target.value);
+  const handleGuest = (selected) => {
+    setGuest({ id: selected.value, username: selected.label });
   };
 
-  const handleAddGuest = () => {
+  const handleAddGuest = async () => {
     onError("guests", null);
-    if (!guest || guest === " ") {
-      onError("guests", "Guest field cannot be empty");
+    // TODO: check if guest is already in the list before adding
+    const tempGuest = editGuests.concat(guest);
+    setEditGuests(tempGuest);
+    const body = {
+      id: guest.id,
+      author: eventDetails.author,
+      event_id: eventDetails.id,
+    };
+    await api.post("/guest/add", body);
+  };
+
+  const handleDeleteGuest = async (delGuest) => {
+    onError("guests", null);
+    const tempGuest = editGuests.filter((guest) => {
+      return guest.id !== delGuest.id;
+    });
+    if (tempGuest.length < 1) {
+      onError("guests", "Please tag atleast 1 guest");
     } else {
-      const tempGuest = guests.concat(guest);
-      onEditGuests(tempGuest);
+      const body = {
+        id: delGuest.id,
+      };
+      setEditGuests(tempGuest);
+      await api.post("/guest/delete", body);
     }
   };
 
@@ -112,7 +123,7 @@ export default function EditModal({
       // TODO: check if start time is > than currentTime
       const editEvent = {
         ...eventDetails,
-        guests: guests,
+        guests: editGuests,
         date: changed.date ? date.toISOString() : date,
         startTime: changed.start ? startTime.toISOString() : startTime,
         endTime: changed.end ? endTime.toISOString() : endTime,
@@ -211,7 +222,7 @@ export default function EditModal({
                     onChange={handleGuest}
                   />
                 </Box>
-                {guests.length < 10 ? (
+                {editGuests.length < 10 ? (
                   <Button
                     variant="outlined"
                     color="primary"
@@ -236,7 +247,7 @@ export default function EditModal({
                 </Box>
               )}
             </Box>
-            {guests.length > 0 && (
+            {editGuests.length > 0 && (
               <Box
                 display="flex"
                 flexDirection="column"
@@ -247,8 +258,13 @@ export default function EditModal({
                 <Box>
                   {/* SCROLLABLE */}
                   {/* TODO: able to and delete */}
-                  {guests.map((guest) => {
-                    return <Box my={1}>{guest.username}</Box>;
+                  {editGuests.map((guest) => {
+                    return (
+                      <Guest
+                        guest={guest}
+                        handleDeleteGuest={handleDeleteGuest}
+                      />
+                    );
                   })}
                 </Box>
               </Box>
