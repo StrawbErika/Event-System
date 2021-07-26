@@ -20,6 +20,7 @@ import {
   reformatTime,
   dateChecker,
   reformatDate,
+  removeUsers,
 } from "../../../../utils";
 import SimpleSnackbar from "../../../../Components/SimpleSnackbar/SimpleSnackbar";
 import { api } from "../../../../api";
@@ -57,6 +58,7 @@ export default function CreateModal({
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [guests, setGuests] = useState([]);
+  const [users, setUsers] = useState(removeUsers(initUsers, guests));
 
   const [date, setDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
@@ -88,6 +90,10 @@ export default function CreateModal({
   const handleAddGuest = () => {
     onError("guests", null);
     const tempGuest = guests.concat(guest);
+    const tempUsers = users.filter((user) => {
+      return user.id !== guest.id;
+    });
+    setUsers(removeUsers(tempUsers, tempGuest));
     setGuests(tempGuest);
   };
 
@@ -214,7 +220,7 @@ export default function CreateModal({
                 <Box mr={1} width="100%">
                   <Select
                     width="200px"
-                    options={initUsers}
+                    options={users}
                     onChange={handleGuest}
                   />
                 </Box>

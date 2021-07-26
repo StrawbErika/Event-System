@@ -23,7 +23,6 @@ export default function Login() {
     if (user.username && user.password) {
       let body = { username: user.username, password: user.password };
       await api.post("/session/login", body);
-      // TODO: has an error
       history.push("/dashboard");
     } else {
       setError("Input user/password in the fields");

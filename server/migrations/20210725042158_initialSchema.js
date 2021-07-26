@@ -12,9 +12,9 @@ exports.up = async function (knex) {
     table.timestamp("startTime");
     table.timestamp("endTime");
     table.string("author");
+    //TODO: Either author_id or author
   });
 
-  // TODO: how to relationship table
   return knex.schema.createTable("users_events", function (table) {
     table.string("author_id");
     table.string("guest_id");

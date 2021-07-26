@@ -64,9 +64,6 @@ export default function Dashboard() {
     run();
   };
 
-  // TODO: reformat dates from library
-  // https://moment.github.io/luxon/#/
-
   useEffect(initDetails, []);
   if (!userDetails) {
     return <></>;

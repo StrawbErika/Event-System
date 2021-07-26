@@ -73,3 +73,11 @@ export const reformatGuests = (guests) => {
   });
   return final;
 };
+
+export const removeUsers = (init, edit) => {
+  return init.filter((users) =>
+    edit.every((e) => {
+      return e.id !== users.value;
+    })
+  );
+};

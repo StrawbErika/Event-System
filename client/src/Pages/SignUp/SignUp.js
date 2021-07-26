@@ -20,7 +20,6 @@ export default function SignUp() {
     if (user.username && user.password) {
       let body = { username: user.username, password: user.password };
       await api.post("/session/signup", body);
-      // TODO: has an error
       history.push("/login");
     } else {
       setError("Input user/password in the fields");

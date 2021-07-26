@@ -16,6 +16,7 @@ import {
 import Select from "react-select";
 import Guest from "../Guest/Guest";
 import { api } from "../../../../api";
+import { reformatGuests, removeUsers } from "../../../../utils";
 
 const useStyles = makeStyles((theme) => ({
   modal: {
@@ -45,8 +46,8 @@ export default function EditModal({
   const classes = useStyles();
   const [guest, setGuest] = useState(null);
   const [editGuests, setEditGuests] = useState(guests);
+  const [users, setUsers] = useState(removeUsers(initUsers, guests));
 
-  // TODO: part of event obj ?
   const [changed, setChanged] = useState({});
   const [date, setDate] = useState(eventDetails.date);
   const [startTime, setStartTime] = useState(eventDetails.startTime);
@@ -83,14 +84,17 @@ export default function EditModal({
 
   const handleAddGuest = async () => {
     onError("guests", null);
-    // TODO: check if guest is already in the list before adding
     const tempGuest = editGuests.concat(guest);
+    const tempUsers = users.filter((user) => {
+      return user.id !== guest.id;
+    });
     setEditGuests(tempGuest);
     const body = {
       id: guest.id,
       author: eventDetails.author,
       event_id: eventDetails.id,
     };
+    setUsers(removeUsers(tempUsers, tempGuest));
     await api.post("/guest/add", body);
   };
 
@@ -99,13 +103,18 @@ export default function EditModal({
     const tempGuest = editGuests.filter((guest) => {
       return guest.id !== delGuest.id;
     });
+    const tempUsers = users.concat(delGuest);
+
     if (tempGuest.length < 1) {
       onError("guests", "Please tag atleast 1 guest");
     } else {
       const body = {
         id: delGuest.id,
       };
+
       setEditGuests(tempGuest);
+      setUsers(removeUsers(reformatGuests(tempUsers), tempGuest));
+
       await api.post("/guest/delete", body);
     }
   };
@@ -215,10 +224,9 @@ export default function EditModal({
             <Box mb={2}>
               <Box mt={1} mb={1} display="flex" width="100%">
                 <Box mr={1} width="100%">
-                  {/* TODO:React select */}
                   <Select
                     width="200px"
-                    options={initUsers}
+                    options={users}
                     onChange={handleGuest}
                   />
                 </Box>
@@ -257,7 +265,6 @@ export default function EditModal({
                 Guests you have invited:
                 <Box>
                   {/* SCROLLABLE */}
-                  {/* TODO: able to and delete */}
                   {editGuests.map((guest) => {
                     return (
                       <Guest
